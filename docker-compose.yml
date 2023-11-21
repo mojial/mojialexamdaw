@@ -1,0 +1,43 @@
+version: "3"
+services:
+  web:
+    build:
+      context: ./www/php
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    container_name: php80
+    depends_on:
+      - database
+    volumes:
+      - ./www:/var/www/html/
+    networks:
+      - my-network
+  database:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    container_name: mysql8.2
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mojial 
+      MYSQL_USER: moises
+      MYSQL_PASSWORD: moises
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - my-network
+  adminphp:
+    image: phpmyadmin/phpmyadmin
+    ports:
+     - 8080:80
+    depends_on:
+      - database
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    name: red
